@@ -32,6 +32,12 @@ mfxStatus Initialize(mfxIMPL impl, mfxVersion ver, MFXVideoSession* pSession, mf
 	
     // Initialize Intel Media SDK Session
     sts = pSession->Init(impl, &ver);
+	if (sts != MFX_ERR_NONE)
+	{
+		printf("The Intel Media SDK is not supported.");
+		MSDK_CHECK_RESULT(sts, MFX_ERR_NONE, sts);
+	}
+
 	mfxIMPL impl_type;
 	sts = pSession->QueryIMPL(&impl_type);   
 
