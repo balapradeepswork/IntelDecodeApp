@@ -39,7 +39,7 @@ mfxStatus IntelDecoder::InitializeX(HWND hWnd)
 
 	pMfxAllocator = (mfxFrameAllocator*)malloc(sizeof(mfxFrameAllocator));
 	memset(pMfxAllocator, 0, sizeof(mfxFrameAllocator));
-	mfxStatus sts = Initialize(impl, ver, pSession, pMfxAllocator, hWnd, DeskBounds);
+	mfxStatus sts = Initialize(impl, ver, pSession, pMfxAllocator);
 	MSDK_CHECK_RESULT(sts, MFX_ERR_NONE, sts);
 	sts = pSession->QueryIMPL(&impl_type);
 	if (impl_type == MFX_IMPL_SOFTWARE)
@@ -75,6 +75,10 @@ mfxStatus IntelDecoder::InitializeX(HWND hWnd)
 	MSDK_CHECK_RESULT(sts, MFX_ERR_NONE, sts);
 
 	mfxVideoParams.AsyncDepth = 1;
+
+	sts = InitializeRender(mfxVideoParams.mfx.FrameInfo.CropW, mfxVideoParams.mfx.FrameInfo.CropH, hWnd);
+	MSDK_CHECK_RESULT(sts, MFX_ERR_NONE, sts);
+
 
 	// Query selected implementation and version
 

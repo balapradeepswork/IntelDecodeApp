@@ -25,7 +25,7 @@ Copyright(c) 2005-2014 Intel Corporation. All Rights Reserved.
  * Windows implementation of OS-specific utility functions
  */
 
-mfxStatus Initialize(mfxIMPL impl, mfxVersion ver, MFXVideoSession* pSession, mfxFrameAllocator* pmfxAllocator, HWND hWnd, RECT DeskBounds, bool bCreateSharedHandles)
+mfxStatus Initialize(mfxIMPL impl, mfxVersion ver, MFXVideoSession* pSession, mfxFrameAllocator* pmfxAllocator, bool bCreateSharedHandles)
 {
     mfxStatus sts = MFX_ERR_NONE;
 
@@ -80,31 +80,37 @@ mfxStatus Initialize(mfxIMPL impl, mfxVersion ver, MFXVideoSession* pSession, mf
         // Since we are using video memory we must provide Media SDK with an external allocator
         sts = pSession->SetFrameAllocator(pmfxAllocator);
         MSDK_CHECK_RESULT(sts, MFX_ERR_NONE, sts);
-
-		RECT WindRect;
-		GetWindowRect(hWnd, &WindRect);
-
-		sts = CreateSwapChain(hWnd, WindRect.right - WindRect.left, WindRect.bottom - WindRect.top);
-		MSDK_CHECK_RESULT(sts, MFX_ERR_NONE, sts);
-
-		sts = CreateSharedSurf(DeskBounds.right - DeskBounds.left, DeskBounds.bottom - DeskBounds.top);
-		MSDK_CHECK_RESULT(sts, MFX_ERR_NONE, sts);
-
-		sts = MakeRTV();
-		MSDK_CHECK_RESULT(sts, MFX_ERR_NONE, sts);
-
-		SetViewPort(WindRect.right - WindRect.left, WindRect.bottom - WindRect.top);
-
-		sts = CreateSamplerState();
-		MSDK_CHECK_RESULT(sts, MFX_ERR_NONE, sts);
-
-		sts = InitShaders();
-		MSDK_CHECK_RESULT(sts, MFX_ERR_NONE, sts);
-
     }
 #endif
 
     return sts;
+}
+
+mfxStatus InitializeRender(int width, int height, HWND hWND)
+{
+	mfxStatus sts = MFX_ERR_NONE;
+
+	RECT WindRect;
+	GetWindowRect(hWND, &WindRect);
+
+	sts = CreateSwapChain(hWND, WindRect.right - WindRect.left, WindRect.bottom - WindRect.top);
+	MSDK_CHECK_RESULT(sts, MFX_ERR_NONE, sts);
+
+	sts = CreateSharedSurf(width, height);
+	MSDK_CHECK_RESULT(sts, MFX_ERR_NONE, sts);
+
+	sts = MakeRTV();
+	MSDK_CHECK_RESULT(sts, MFX_ERR_NONE, sts);
+
+	SetViewPort(WindRect.right - WindRect.left, WindRect.bottom - WindRect.top);
+
+	sts = CreateSamplerState();
+	MSDK_CHECK_RESULT(sts, MFX_ERR_NONE, sts);
+
+	sts = InitShaders();
+	MSDK_CHECK_RESULT(sts, MFX_ERR_NONE, sts);
+	
+	return sts;
 }
 
 void Release()
